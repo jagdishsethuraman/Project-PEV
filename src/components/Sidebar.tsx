@@ -65,41 +65,54 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       {/* Brand Header */}
       <div>
-        <div className="h-16 border-b border-zinc-800 px-4 flex items-center justify-between">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shrink-0">
-              <Zap className="w-5 h-5 fill-emerald-400/20" />
-            </div>
-            {!collapsed && (
-              <div className="flex flex-col truncate">
-                <span className="text-sm font-black tracking-wider uppercase text-zinc-100 flex items-center gap-1.5">
-                  PROJECT PEV
-                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    v2.0
+        <div className={`h-16 border-b border-zinc-800 flex items-center ${collapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
+          {!collapsed ? (
+            <>
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shrink-0">
+                  <Zap className="w-5 h-5 fill-emerald-400/20" />
+                </div>
+                <div className="flex flex-col truncate">
+                  <span className="text-sm font-black tracking-wider uppercase text-zinc-100 flex items-center gap-1.5">
+                    PROJECT PEV
+                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      v2.0
+                    </span>
                   </span>
-                </span>
-                <span className="text-[10px] text-zinc-400 font-medium">EV vs Petrol TCO Calculator</span>
+                  <span className="text-[10px] text-zinc-400 font-medium">EV vs Petrol TCO</span>
+                </div>
               </div>
-            )}
-          </div>
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="hidden md:flex p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
-            title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
+              <button
+                onClick={() => setCollapsed(true)}
+                className="hidden md:flex p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+                title="Collapse Sidebar"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setCollapsed(false)}
+              className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center justify-center relative group"
+              title="Expand Sidebar"
+            >
+              <Zap className="w-5 h-5 fill-emerald-400/20" />
+              <div className="absolute -right-2 -top-1 bg-zinc-800 border border-zinc-700 text-zinc-300 rounded-full p-0.5 shadow-md">
+                <ChevronRight className="w-3 h-3" />
+              </div>
+            </button>
+          )}
         </div>
 
         {/* Currency & Connection Status Strip */}
-        <div className={`px-4 py-2.5 bg-zinc-950/60 border-b border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400 ${collapsed ? 'justify-center' : ''}`}>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-zinc-800 text-emerald-400 border border-zinc-700">
-              {currencySymbol} {currency}
-            </span>
-            {!collapsed && <span className="text-[11px] text-zinc-400 font-medium">India Market</span>}
-          </div>
-          {!collapsed && (
+        {!collapsed ? (
+          <div className="px-4 py-2.5 bg-zinc-950/60 border-b border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-zinc-800 text-emerald-400 border border-zinc-700">
+                {currencySymbol} {currency}
+              </span>
+              <span className="text-[11px] text-zinc-400 font-medium">India Market</span>
+            </div>
             <div className="flex items-center gap-1 text-[10px] font-semibold">
               {isOffline ? (
                 <span className="text-rose-400 flex items-center gap-1">
@@ -111,11 +124,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="py-2.5 bg-zinc-950/60 border-b border-zinc-800/80 flex items-center justify-center">
+            <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-zinc-800 text-emerald-400 border border-zinc-700">
+              {currencySymbol}
+            </span>
+          </div>
+        )}
 
         {/* Navigation Items */}
-        <nav className="p-3 space-y-1.5 mt-2">
+        <nav className="p-2 space-y-1.5 mt-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -123,14 +142,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all cursor-pointer ${
+                className={`w-full flex items-center rounded-xl font-semibold text-xs transition-all cursor-pointer ${
+                  collapsed
+                    ? 'h-11 justify-center'
+                    : 'px-3.5 py-2.5 gap-3'
+                } ${
                   isActive
                     ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 border border-transparent'
-                } ${collapsed ? 'justify-center px-0' : ''}`}
+                }`}
                 title={collapsed ? item.label : undefined}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-emerald-400' : 'text-zinc-400'}`} />
+                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-emerald-400' : 'text-zinc-400'}`} />
                 {!collapsed && (
                   <div className="flex items-center justify-between w-full">
                     <span className="truncate">{item.label}</span>
@@ -148,12 +171,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Footer & Quick Actions */}
-      <div className="p-3 border-t border-zinc-800 bg-zinc-950/40 space-y-2">
+      <div className="p-2 border-t border-zinc-800 bg-zinc-950/40 space-y-2">
         {/* Guided Wizard Trigger */}
         <button
           onClick={onOpenWizard}
-          className={`w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-emerald-500/20 cursor-pointer flex items-center justify-center gap-2 ${
-            collapsed ? 'px-0' : 'px-3'
+          className={`w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-emerald-500/20 cursor-pointer flex items-center justify-center gap-2 ${
+            collapsed ? 'h-10' : 'py-2.5 px-3'
           }`}
           title="Start Guided Commute Flow"
         >
@@ -161,7 +184,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!collapsed && <span>Guided Flow</span>}
         </button>
 
-        {/* Action Controls (Theme, CSV, Reset) */}
+        {/* Action Controls */}
         {!collapsed ? (
           <div className="grid grid-cols-3 gap-1.5 pt-1">
             <button
@@ -190,7 +213,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex flex-col gap-1.5 items-center pt-1">
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-lg bg-zinc-800 text-zinc-300"
+              className="p-2.5 rounded-xl bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
               title="Toggle Theme"
             >
               {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}

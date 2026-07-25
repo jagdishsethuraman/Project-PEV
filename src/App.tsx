@@ -15,8 +15,9 @@ import { CashFlowTable } from './components/CashFlowTable';
 import { GuidedInputWizard } from './components/GuidedInputWizard';
 import { VehicleCatalogModal } from './components/VehicleCatalogModal';
 import { SettingsView } from './components/SettingsView';
+import { CatalogView } from './components/CatalogView';
 
-import { Sparkles, Car, CheckCircle2, ArrowRight, Menu, Zap } from 'lucide-react';
+import { Sparkles, Car, CheckCircle2, ArrowRight, Menu, Zap, Download } from 'lucide-react';
 
 export default function App() {
   const defaultPreset = PRESET_PROFILES[0];
@@ -159,7 +160,7 @@ export default function App() {
         </button>
       </div>
 
-      {/* Responsive Left Sidebar Navigation */}
+      {/* Left Sidebar Navigation */}
       <div className={`${mobileMenuOpen ? 'block' : 'hidden'} md:block`}>
         <Sidebar
           activeTab={activeTab}
@@ -180,10 +181,10 @@ export default function App() {
         />
       </div>
 
-      {/* Main Workspace View */}
+      {/* Main Workspace Area */}
       <div className={`transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         
-        {/* Top Preset & Quick Action Header */}
+        {/* Top Preset Header */}
         <header className="border-b border-zinc-800/80 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="text-xs text-zinc-400 font-medium">Preset Scenario:</div>
@@ -202,7 +203,7 @@ export default function App() {
 
           <div className="flex items-center gap-2.5">
             <button
-              onClick={() => setIsCatalogOpen(true)}
+              onClick={() => setActiveTab('catalog')}
               className="px-3.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2"
             >
               <Car className="w-3.5 h-3.5 text-cyan-400" />
@@ -211,14 +212,15 @@ export default function App() {
 
             <button
               onClick={handleExportCSV}
-              className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5"
             >
-              Export CSV
+              <Download className="w-3.5 h-3.5" />
+              <span>CSV</span>
             </button>
           </div>
         </header>
 
-        {/* Dynamic Tab Content Area */}
+        {/* Tab Specific Content (Zero Duplication) */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
           
           {/* Personalized Active Note Banner */}
@@ -271,7 +273,7 @@ export default function App() {
                   </button>
 
                   <button
-                    onClick={() => setIsCatalogOpen(true)}
+                    onClick={() => setActiveTab('catalog')}
                     className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <Car className="w-4 h-4 text-cyan-400" />
@@ -279,16 +281,6 @@ export default function App() {
                   </button>
                 </div>
               </div>
-
-              {/* Realtime Gas & Electricity Sync Bar */}
-              <RealtimeRatesBar
-                settings={settings}
-                setSettings={setSettings}
-                petrolInput={petrolInput}
-                setPetrolInput={setPetrolInput}
-                evInput={evInput}
-                setEVInput={setEVInput}
-              />
 
               {/* Executive Summary Cards */}
               <SummaryCards
@@ -326,11 +318,6 @@ export default function App() {
                 setEVInput={setEVInput}
               />
 
-              <SummaryCards
-                summary={summary}
-                settings={settings}
-              />
-
               <VehicleInputForm
                 settings={settings}
                 setSettings={setSettings}
@@ -344,45 +331,17 @@ export default function App() {
 
           {/* TAB 3: VEHICLE CATALOG */}
           {activeTab === 'catalog' && (
-            <div className="space-y-6 animate-in fade-in duration-200">
-              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-xl flex items-center justify-between">
-                <div>
-                  <h1 className="text-xl font-bold text-zinc-100 uppercase tracking-wide flex items-center gap-2">
-                    <Car className="w-5 h-5 text-cyan-400" />
-                    <span>40 Indian Car Models Database</span>
-                  </h1>
-                  <p className="text-xs text-zinc-400 mt-1">
-                    Select any EV or Petrol model to load real-world specifications, pricing, and efficiency parameters directly into your calculator.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsCatalogOpen(true)}
-                  className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xs uppercase tracking-wider transition-all cursor-pointer"
-                >
-                  Open Catalog Modal
-                </button>
-              </div>
-
-              {/* Directly embedded catalog view */}
-              <VehicleInputForm
-                settings={settings}
-                setSettings={setSettings}
-                petrolInput={petrolInput}
-                setPetrolInput={setPetrolInput}
-                evInput={evInput}
-                setEVInput={setEVInput}
-              />
-            </div>
+            <CatalogView
+              currencySymbol={settings.currencySymbol}
+              currency={settings.currency}
+              onSelectVehicle={handleSelectVehicleFromCatalog}
+              onOpenWizard={() => setIsWizardOpen(true)}
+            />
           )}
 
           {/* TAB 4: CASH FLOW & EXPORT */}
           {activeTab === 'cashflow' && (
             <div className="space-y-6 animate-in fade-in duration-200">
-              <SummaryCards
-                summary={summary}
-                settings={settings}
-              />
-
               <CashFlowTable
                 yearlyMetrics={yearlyMetrics}
                 settings={settings}
