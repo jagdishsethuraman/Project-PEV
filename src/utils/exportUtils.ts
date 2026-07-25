@@ -93,3 +93,12 @@ export function loadStateFromLocalStorage() {
   }
   return null;
 }
+
+export function clearLocalStorage() {
+  try {
+    localStorage.removeItem('ev_petrol_calculator_state');
+  } catch (err) {
+    console.error('Failed to clear localStorage:', err);
+  }
+}
+
